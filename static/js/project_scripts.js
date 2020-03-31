@@ -76,14 +76,15 @@ function fit_model(){
             success: function (data) {
                 console.log("SUCCESS0");
                 let error_code = data["error_code"];
-                console.log(error_code);
+                console.log(data);
                 if (error_code === 0){
                     let scores = data["scores"];
+                    console.log("here");
                     $('#scores').html();
-                    $('#accuracy').innerHTML = scores["accuracy"];
-                    $('#recall').innerHTML = scores["recall"];
-                    $('#precision').innerHTML = scores["precision"];
-                    $('#f_score').innerHTML = scores["f_score"];
+                    $('#accuracy').html(scores["accuracy"]);
+                    $('#recall').html(scores["recall"]);
+                    $('#precision').html(scores["precision"]);
+                    $('#f_score').html(scores["f_score"]);
                 }
                 else if (error_code === 1) {
                     $('#scores').html("Ошибка в аргументах");

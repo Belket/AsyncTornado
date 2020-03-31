@@ -24,7 +24,7 @@ class MainHandler(Controller):
                     model_methods=self.models.get_models(),
                     balancing_methods=self.processing.get_balancing_methods())
 
-    async def post(self):
+    def post(self):
 
         try:
             request = json_decode(self.request.body)
@@ -34,13 +34,13 @@ class MainHandler(Controller):
             response = {"error_code": ServerErrors.MISS_ARG}
         else:
             if command == ServerCommands.FIT_MODEL:
-                response = await self.fit_model(args, session)
+                response = self.fit_model(args, session)
             else:
                 response = {"error_code": ServerErrors.COMMAND_NOT_EXIST}
         finally:
             self.finish(response)
 
-    async def fit_model(self, args, session):
+    def fit_model(self, args, session):
         try:
             filter_method, balancing_method, model = args["filter_method"], args["balancing_method"], args["model"]
         except KeyError:
@@ -60,6 +60,7 @@ class MainHandler(Controller):
                         error_code, best_estimator = self.models.use_gscv(df, model)
                         if error_code == ServerErrors.NO_ERROR:
                             error_code, scores = self.models.use_kfolds(df, best_estimator)
+        os.remove("static/dataframes/" + session + ".csv")
         return {"error_code": error_code, "scores": scores}
 
 
@@ -78,18 +79,3 @@ class MainHandler(Controller):
 
 
 
-
-
-
-
-
-#
-# class MainHandler(RequestHandler, Controller):
-#
-#     async def cycle(self):
-#         await asyncio.sleep(10)
-#         self.finish("10")
-#
-#     async def get(self):
-#         print("HERE")
-#         await self.cycle()

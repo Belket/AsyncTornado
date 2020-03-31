@@ -4,13 +4,6 @@ import numpy as np
 import pandas as pd
 
 
-def dataset_preprocessing(df, distance_metrics=[euclidean_distances]):
-    date_column = df.date1
-    df.drop(["date1"], inplace=True, axis=1)
-    replace_all_nan_by_values_from_closest_vector(df, distance_metrics)
-    df["date1"] = date_column
-
-
 def appropriate_strings(df_without_none, string_with_nan, distance_metrics):
     most_appropriate_indexes = {}
     for distance_metric in distance_metrics:
@@ -25,7 +18,6 @@ def appropriate_strings(df_without_none, string_with_nan, distance_metrics):
 def replace_all_nan_by_values_from_closest_vector(df, distance_metrics):
     # creation of dataset without nan values
     df["index"] = df.index  # create column which will duplicate indexes to drop and restore rows with nan
-
     columns_with_nan = [column for column in df.columns if np.sum(df[column].isnull()) != 0]  # find columns with nan
     df_without_none = df.drop(df[columns_with_nan], axis=1)  # create dataset without columns with nan
 
@@ -53,3 +45,10 @@ def replace_all_nan_by_values_from_closest_vector(df, distance_metrics):
             if pd.isnull(string_with_nan[column_with_nan]):
                 df.loc[nan_index, column_with_nan] = closest_string[column_with_nan]  # set value
     df.drop(['index'], inplace=True, axis=1)
+
+
+def dataset_preprocessing(df, distance_metrics=[euclidean_distances]):
+    date_column = df.date1
+    df.drop(["date1"], inplace=True, axis=1)
+    replace_all_nan_by_values_from_closest_vector(df, distance_metrics)
+    df["date1"] = date_column

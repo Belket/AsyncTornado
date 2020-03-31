@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from copy import deepcopy
 from sklearn.model_selection import train_test_split, GridSearchCV, KFold
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
 class Models:
@@ -13,6 +14,15 @@ class Models:
     def __init__(self):
         self.__models = {}
         self.initialization_process()
+
+    @staticmethod
+    def classification_scores(y_hat, y_test):
+        scores = dict()
+        scores["accuracy"] = accuracy_score(y_hat, y_test)
+        scores["precision"] = precision_score(y_hat, y_test)
+        scores["recall"] = recall_score(y_hat, y_test)
+        scores["f_score"] = f1_score(y_hat, y_test)
+        return scores
 
     def initialization_process(self):
         for method in ServerModelsMethods.methods:
@@ -43,6 +53,7 @@ class Models:
             model_data = self.__models.get(model)
             model_object = model_data.sklearn_model
             parameters = model_data.parameters
+
             data = deepcopy(df)
             y = data['respiratory_disease']
             X = data.drop(['respiratory_disease'], axis=1)
@@ -69,7 +80,7 @@ class Models:
 
                 best_estimator.fit(X_train, y_train)
                 y_hat = best_estimator.predict(X_test)
-                model_score = best_estimator(y_hat, y_test)
+                model_score = Models.classification_scores(y_hat, y_test)
                 accuracies.append(model_score.get("accuracy"))
                 recalls.append(model_score.get("recall"))
                 precisions.append(model_score.get("precision"))

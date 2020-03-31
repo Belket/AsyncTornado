@@ -22,17 +22,14 @@ class ProcessingMethods:
         return balancing_methods_information
 
     def use_filter_method(self, df, filter_method):
-        try:
-            method = self.__filter_methods.get(filter_method)
-            df = method(df)
-            return ServerErrors.NO_ERROR, df
-        except:
-            return ServerErrors.FILTERING_ERROR, None
+        filter_object = self.__filter_methods.get(filter_method)
+        df = filter_object.method(df)
+        return ServerErrors.NO_ERROR, df
 
     def use_balancing_method(self, df, balancing_method):
         try:
-            method = self.__balancing_methods.get(balancing_method)
-            df = method(df)
+            balancing_method = self.__balancing_methods.get(balancing_method)
+            df = balancing_method.method(df)
             return ServerErrors.NO_ERROR, df
         except:
             return ServerErrors.BALANCING_ERROR, None
