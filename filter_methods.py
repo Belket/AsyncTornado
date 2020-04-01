@@ -41,6 +41,7 @@ class FilterMethods:
         df = deepcopy(data)
         y = df['respiratory_disease']
         X = df.drop(['respiratory_disease'], axis=1)  # Feature Matrix
+        X.drop(["date1"], axis=1, inplace=True)
         columns = list(X.columns)
         pmax = 1
         while len(columns) > 0:
@@ -63,6 +64,7 @@ class FilterMethods:
         df = deepcopy(data)
         y = df['respiratory_disease']
         X = df.drop(['respiratory_disease'], axis=1)  # Feature Matrix
+        X.drop(["date1"], axis=1, inplace=True)
         model = LogisticRegression()  # Initializing RFE model
         rfe = RFE(model, 7)  # Transforming data using RFE
         X_rfe = rfe.fit_transform(X, y)  # Fitting the data to model

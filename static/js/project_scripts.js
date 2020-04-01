@@ -1,3 +1,4 @@
+
 function uuid4(){
     let dt = new Date().getTime();
     let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -8,8 +9,27 @@ function uuid4(){
     return uuid;
 }
 
+function error_alert(message){
+    $('#mistake').html(message);
+    $('#accuracy').html("");
+    $('#recall').html("");
+    $('#precision').html("");
+    $('#f_score').html("");
+}
+
 function initialize(){
     session_uuid = uuid4();
+
+    NO_ERROR = 0;
+    MISS_ARG = 1;
+    COMMAND_NOT_EXIST = 2;
+    WRONG_INPUT_DATA = 3;
+    PROCESSING_ERROR = 4;
+    FILTERING_ERROR = 5;
+    BALANCING_ERROR = 6;
+    GSCV_ERROR = 7;
+    KFOLDS_ERROR = 8;
+
 }
 
 function load_df() {
@@ -30,21 +50,8 @@ function load_df() {
         error: function () {
             $('#scores').text("Запрос не может быть обработан");
         },
-
         success: function (data) {
-            let error_code = data["error_code"];
-            if (error_code === 0){
-                let scores = data["scores"];
-            }
-            else if (error_code === 1) {
-                $('#scores').html("Ошибка в аргументах");
-            }
-            else if (data === 2) {
-                $('#scores').html("Запрос не существует");
-            }
-            else {
-                $('#scores').html("Неизвестная ошибка");
-            }
+            console.log("Файл отправлен");
         }
     });
 }
@@ -77,23 +84,42 @@ function fit_model(){
                 console.log("SUCCESS0");
                 let error_code = data["error_code"];
                 console.log(data);
-                if (error_code === 0){
+
+
+                if (error_code === NO_ERROR){
                     let scores = data["scores"];
-                    console.log("here");
-                    $('#scores').html();
-                    $('#accuracy').html(scores["accuracy"]);
-                    $('#recall').html(scores["recall"]);
-                    $('#precision').html(scores["precision"]);
-                    $('#f_score').html(scores["f_score"]);
+                    $('#mistake').html("");
+                    $('#accuracy').html("Доля правильных ответов: " + scores["accuracy"]);
+                    $('#recall').html("Точность: " + scores["recall"]);
+                    $('#precision').html("Полнота: " + scores["precision"]);
+                    $('#f_score').html("F мера: " + scores["f_score"]);
                 }
-                else if (error_code === 1) {
-                    $('#scores').html("Ошибка в аргументах");
+                else if (error_code === MISS_ARG) {
+                    error_alert("Ошибка в аргументах");
                 }
-                else if (data === 2) {
-                    $('#scores').html("Запрос не существует");
+                else if (error_code === COMMAND_NOT_EXIST) {
+                    error_alert("Команда не существует");
+                }
+                else if (error_code === WRONG_INPUT_DATA) {
+                    error_alert("Неверные входные данные");
+                }
+                else if (error_code === PROCESSING_ERROR) {
+                    error_alert("Ошибка предобработки данных, проверьте входные данные");
+                }
+                else if (error_code === FILTERING_ERROR) {
+                    error_alert("Ошибка методов фильтрации, попробуйте воспользоваться другим методом");
+                }
+                else if (error_code === BALANCING_ERROR) {
+                    error_alert("Ошибка балансировки классов, попробуйте воспользоваться другим методом");
+                }
+                else if (error_code === GSCV_ERROR) {
+                    error_alert("Ошибка в подборе параметров, попробуйте воспользоваться другой моделью");
+                }
+                else if (error_code === KFOLDS_ERROR) {
+                    error_alert("Ошибка в обучении модели, попробуйте воспользоваться другой моделью");
                 }
                 else {
-                    $('#scores').html("Неизвестная ошибка");
+                    error_alert("Неизвестная ошибка");
                 }
             }
         });

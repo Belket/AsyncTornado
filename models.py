@@ -15,6 +15,10 @@ class Models:
         self.__models = {}
         self.initialization_process()
 
+    def initialization_process(self):
+        for method in ServerModelsMethods.methods:
+            self.__models[method.model_id] = method
+
     @staticmethod
     def classification_scores(y_hat, y_test):
         scores = dict()
@@ -23,10 +27,6 @@ class Models:
         scores["recall"] = recall_score(y_hat, y_test)
         scores["f_score"] = f1_score(y_hat, y_test)
         return scores
-
-    def initialization_process(self):
-        for method in ServerModelsMethods.methods:
-            self.__models[method.model_id] = method
 
     def get_models(self):
         models_information = [model.model_information() for model in self.__models.values()]
@@ -65,12 +65,12 @@ class Models:
             return ServerErrors.GSCV_ERROR, None
 
     def use_kfolds(self, df, best_estimator):
+        model_score = {"accuracy": "", "precision": "", "recall": "", "f_score": ""}
         try:
             accuracies = []
             recalls = []
             precisions = []
             f_scores = []
-            model_score = {"accuracy": "", "precision": "", "recall": "", "f_score": ""}
             y = df['respiratory_disease']
             X = df.drop(['respiratory_disease'], axis=1)
             kf = KFold(n_splits=3, shuffle=True, random_state=123)

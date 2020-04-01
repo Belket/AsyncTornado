@@ -14,6 +14,7 @@ class FileHandler(Controller):
         final_filename = session + extension
         output_file = open("static/dataframes/" + final_filename, 'w')
         output_file.write(df_file['body'].decode())
+        self.finish({"error_code": ServerErrors.NO_ERROR})
 
 
 class MainHandler(Controller):
@@ -60,7 +61,8 @@ class MainHandler(Controller):
                         error_code, best_estimator = self.models.use_gscv(df, model)
                         if error_code == ServerErrors.NO_ERROR:
                             error_code, scores = self.models.use_kfolds(df, best_estimator)
-        os.remove("static/dataframes/" + session + ".csv")
+
+            os.remove("static/dataframes/" + session + ".csv")
         return {"error_code": error_code, "scores": scores}
 
 
